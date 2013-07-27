@@ -2,7 +2,7 @@ Todo
 ====
 
 
-* vertex array buffers
+* vertex buffer objects
 * 3d
 
 * glfw stable release as submodule

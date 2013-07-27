@@ -1,8 +1,8 @@
 #include <cstddef>
 #include <iostream>
 #include <stdexcept>
-
-#include <GLFW/glfw3.h>
+#include <vector>
+#include <iterator>
 
 #include "Utility.h"
 #include "Renderer.h"
@@ -24,7 +24,7 @@ void Renderer::init() {
     throw std::runtime_error("glfw initialization failed");
 
   glfwWindowHint(GLFW_RESIZABLE, false);
-  window = glfwCreateWindow(640, 480, "glfw-leap-viewer", nullptr, nullptr);
+  window = glfwCreateWindow(800, 600, "glfw-leap-viewer", nullptr, nullptr);
 
   if (!window) {
     glfwTerminate();
@@ -36,51 +36,52 @@ void Renderer::init() {
   glfwSetKeyCallback(window, key_callback);
 
   glLineWidth(10.0f);
-  glPointSize(5.0f);
+  glPointSize(10.0f);
 }
 
 void Renderer::render() noexcept {
+  const Leap::Vector one(1, 1, 1);
+
+  std::vector<GLfloat> vertices;
+  vertices.reserve(10); // no reallocation for two hands
+
   while (likely(!glfwWindowShouldClose(window))) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glClearColor(1, 1, 1, 1);
 
-    // preserve monadic behavior, e.g. for situations where the Leap Motion is not connected
-    // no user input is rendered in those situations by doing this
-    const auto frame = controller.frame();
-    const auto box = frame.interactionBox();
-
-
-    glColor3f(1, 0, 0);
-    glBegin(GL_POINTS);
+    const auto& frame = controller.frame();
+    const auto& box = frame.interactionBox();
 
     for (const auto& pointable : frame.pointables()) {
-      const auto tip = pointable.stabilizedTipPosition();
+      const auto& tip = pointable.stabilizedTipPosition();
 
       // normalized member function gives us [0,1], we need [-1, 1]
-      const Leap::Vector one(1, 1, 1);
-      const auto normalized = (box.normalizePoint(tip) * 2.0f) - one;
+      const auto& normalized = (box.normalizePoint(tip) * 2.0f) - one;
 
-      glVertex3f(normalized.x, normalized.y, normalized.z);
+      const auto rawdata = normalized.toFloatPointer();
+      vertices.insert(std::end(vertices), rawdata, rawdata + 3);
     }
 
-    glEnd();
-
-
-  /* TODO: optimized
-    glEnableClientState(GL_VERTEX_ARRAY);
-    glEnableClientState(GL_COLOR_ARRAY);
-
-    glVertexPointer(3, GL_FLOAT, 0, vertices);
-    glColorPointer(3, GL_FLOAT, 0, colors);
-    glDrawArrays(GL_POINTS, 0, safe_sizeof(vertices) / 3);
-
-    glDisableClientState(GL_VERTEX_ARRAY);
-    glDisableClientState(GL_COLOR_ARRAY);
-  */
+    if (likely(!vertices.empty())) {
+      drawCloud(vertices);
+      vertices.clear();
+    }
 
     glfwSwapBuffers(window);
     glfwPollEvents();
   }
+}
+
+void Renderer::drawCloud(const std::vector<GLfloat>& cloud) noexcept {
+  glEnableClientState(GL_VERTEX_ARRAY);
+  glEnableClientState(GL_COLOR_ARRAY);
+
+  glVertexPointer(3, GL_FLOAT, 0, &cloud[0]);
+  glColorPointer(3, GL_FLOAT, 0, &cloud[0]);
+  glDrawArrays(GL_POINTS, 0, cloud.size() / 3);
+
+  glDisableClientState(GL_VERTEX_ARRAY);
+  glDisableClientState(GL_COLOR_ARRAY);
 }
 
 

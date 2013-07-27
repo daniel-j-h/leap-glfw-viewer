@@ -1,9 +1,8 @@
 #pragma once
 
+#include <GLFW/glfw3.h>
 #include <Leap.h>
 
-
-struct GLFWwindow;
 
 class Renderer final {
 
@@ -17,8 +16,11 @@ class Renderer final {
 
 
   private:
+
     GLFWwindow* window;
     Leap::Controller controller;
+
+    static void drawCloud(const std::vector<GLfloat>&) noexcept;
 
     static void error_callback(int, const char*) noexcept;
     static void key_callback(GLFWwindow*, int, int, int, int) noexcept;

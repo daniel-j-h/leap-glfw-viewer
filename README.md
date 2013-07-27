@@ -8,7 +8,7 @@ This is more or less my experimental playground and / or a template for more adv
 Requirements
 ------------
 
-* Leap SDK (Tested with Leap-0.8.0-x64 on GNU/Linux Gentoo)
+* Leap SDK (tested with Leap-0.8.0-x64 on GNU/Linux Gentoo)
 * GCC (tested with 4.7.3) or Clang (tested with 3.3)
 * GLFW 3 (installation instruction below)
 

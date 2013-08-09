@@ -20,7 +20,7 @@ class Renderer final {
     GLFWwindow* window;
     Leap::Controller controller;
 
-    static void drawCloud(const std::vector<GLfloat>&) noexcept;
+    static void draw_cloud(const std::vector<GLfloat>&) noexcept;
 
     static void error_callback(int, const char*) noexcept;
     static void key_callback(GLFWwindow*, int, int, int, int) noexcept;

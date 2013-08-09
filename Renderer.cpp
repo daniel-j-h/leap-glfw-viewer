@@ -4,7 +4,6 @@
 #include <vector>
 #include <iterator>
 
-#include "Utility.h"
 #include "Renderer.h"
 
 
@@ -45,7 +44,7 @@ void Renderer::render() noexcept {
   std::vector<GLfloat> vertices;
   vertices.reserve(10); // no reallocation for two hands
 
-  while (likely(!glfwWindowShouldClose(window))) {
+  while (!glfwWindowShouldClose(window)) {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glClearColor(1, 1, 1, 1);
 
@@ -62,8 +61,8 @@ void Renderer::render() noexcept {
       vertices.insert(std::end(vertices), rawdata, rawdata + 3);
     }
 
-    if (likely(!vertices.empty())) {
-      drawCloud(vertices);
+    if (!vertices.empty()) {
+      draw_cloud(vertices);
       vertices.clear();
     }
 
@@ -72,7 +71,7 @@ void Renderer::render() noexcept {
   }
 }
 
-void Renderer::drawCloud(const std::vector<GLfloat>& cloud) noexcept {
+void Renderer::draw_cloud(const std::vector<GLfloat>& cloud) noexcept {
   glEnableClientState(GL_VERTEX_ARRAY);
   glEnableClientState(GL_COLOR_ARRAY);
 
@@ -84,23 +83,23 @@ void Renderer::drawCloud(const std::vector<GLfloat>& cloud) noexcept {
   glDisableClientState(GL_COLOR_ARRAY);
 }
 
-
-// Callbacks; right now we use only the most essential arguments
-
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-
 void Renderer::error_callback(int error, const char* description) noexcept {
+  (void)error;
+
   std::cerr << description << std::endl;
 }
 
 void Renderer::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) noexcept {
+  (void)scancode;
+  (void)mods;
+
   if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
     glfwSetWindowShouldClose(window, GL_TRUE);
 }
 
 void Renderer::framebuffer_size_callback(GLFWwindow* window, int width, int height) noexcept {
+  (void)window;
+
   glViewport(0, 0, width, height);
 }
 
-#pragma GCC diagnostic pop

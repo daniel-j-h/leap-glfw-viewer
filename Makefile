@@ -20,7 +20,7 @@ $(TARGET): Main.o Renderer.o
 Main.o: Main.cpp
 	@$(CXX) $(CXXFLAGS) -I $(LEAP_SDK)/include -c $<
 
-Renderer.o: Renderer.cpp Renderer.h Utility.h
+Renderer.o: Renderer.cpp Renderer.h
 	@$(CXX) $(CXXFLAGS) -I $(LEAP_SDK)/include -c $<
 
 
